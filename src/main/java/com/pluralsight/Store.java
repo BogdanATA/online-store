@@ -1,7 +1,12 @@
 
 package com.pluralsight;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 /**
@@ -10,14 +15,17 @@ import java.util.Scanner;
  */
 public class Store {
 
+    private static final String FILE_NAME = "products.csv";
+    private static final HashMap<Integer, Product> inventory = new HashMap<>();
+
     public static void main(String[] args) {
 
         // Create lists for inventory and the shopping cart
-        ArrayList<Product> inventory = new ArrayList<>();
+
         ArrayList<Product> cart = new ArrayList<>();
 
         // Load inventory from the data file (pipe-delimited: id|name|price)
-        loadInventory("products.csv", inventory);
+        loadInventory(FILE_NAME, inventory);
 
         // Main menu loop
         Scanner scanner = new Scanner(System.in);
@@ -55,16 +63,42 @@ public class Store {
      * Example line:
      * A17|Wireless Mouse|19.99
      */
-    public static void loadInventory(String fileName, ArrayList<Product> inventory) {
-        // TODO: read each line, split on "|",
-        //       create a Product object, and add it to the inventory list
+    public static void loadInventory(String fileName, HashMap<Integer, Product> inventory) {
+        try {
+            File file = new File(fileName);
+
+            if (!file.exists()){
+                file.createNewFile();
+            }
+            BufferedReader br = new BufferedReader(new FileReader(fileName));
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                try {
+                    String[] tokens = line.split("\\|");
+
+                    int id = Integer.parseInt(tokens[0]);
+                    String name = tokens[1];
+                    double price = Double.parseDouble(tokens[2]);
+
+                    Product product = new Product(id, name, price);
+
+                    inventory.put(id, product);
+
+                } catch (NumberFormatException e) {
+                    System.err.println("Bad line; " + line);
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading file");
+        }
     }
 
     /**
      * Displays all products and lets the user add one to the cart.
      * Typing X returns to the main menu.
      */
-    public static void displayProducts(ArrayList<Product> inventory,
+    public static void displayProducts(HashMap<Integer, Product> inventory,
                                        ArrayList<Product> cart,
                                        Scanner scanner) {
         // TODO: show each product (id, name, price),
