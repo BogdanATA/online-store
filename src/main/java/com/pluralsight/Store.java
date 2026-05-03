@@ -9,21 +9,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
-/**
- * Starter code for the Online Store workshop.
- * Students will complete the TODO sections to make the program work.
- */
+
 public class Store {
 
     private static final String FILE_NAME = "products.csv";
-    private static final HashMap<Integer, Product> inventory = new HashMap<>();
+    // Create lists for inventory and the shopping cart
+    private static final HashMap<String, Product> inventoryMap = new HashMap<>();
+    private static final ArrayList<Product> inventory = new ArrayList<>();
+    private static final ArrayList<Product> cart = new ArrayList<>();
 
     public static void main(String[] args) {
-
-        // Create lists for inventory and the shopping cart
-
-        ArrayList<Product> cart = new ArrayList<>();
-
         // Load inventory from the data file (pipe-delimited: id|name|price)
         loadInventory(FILE_NAME, inventory);
 
@@ -46,7 +41,7 @@ public class Store {
             scanner.nextLine();                     // clear newline
 
             switch (choice) {
-                case 1 -> displayProducts(inventory, cart, scanner);
+                case 1 -> displayProducts(inventory, scanner);
                 case 2 -> displayCart(cart, scanner);
                 case 3 -> System.out.println("Thank you for shopping with us!");
                 default -> System.out.println("Invalid choice!");
@@ -56,14 +51,12 @@ public class Store {
     }
 
     /**
-     * Reads product data from a file and populates the inventory list.
-     * File format (pipe-delimited):
-     * id|name|price
-     * <p>
-     * Example line:
-     * A17|Wireless Mouse|19.99
+     * Loads product data from file and puts it into inventory HashMap.
+     *
+     * @param fileName file used to read data from
+     * @param inventory HashMap
      */
-    public static void loadInventory(String fileName, HashMap<Integer, Product> inventory) {
+    public static void loadInventory(String fileName, ArrayList<Product> inventory) {
         try {
             File file = new File(fileName);
 
@@ -77,13 +70,13 @@ public class Store {
                 try {
                     String[] tokens = line.split("\\|");
 
-                    int id = Integer.parseInt(tokens[0]);
+                    String id = tokens[0];
                     String name = tokens[1];
                     double price = Double.parseDouble(tokens[2]);
 
                     Product product = new Product(id, name, price);
 
-                    inventory.put(id, product);
+                    inventory.add(product);
 
                 } catch (NumberFormatException e) {
                     System.err.println("Bad line; " + line);
@@ -98,11 +91,29 @@ public class Store {
      * Displays all products and lets the user add one to the cart.
      * Typing X returns to the main menu.
      */
-    public static void displayProducts(HashMap<Integer, Product> inventory,
-                                       ArrayList<Product> cart,
+    public static void displayProducts(ArrayList<Product> inventory,
                                        Scanner scanner) {
         // TODO: show each product (id, name, price),
         //       prompt for an id, find that product, add to cart
+        printProducts(inventory);
+
+        boolean running = true;
+        while (running){
+            System.out.println("\nWelcome to the Product Page");
+            System.out.println("A. Add Product");
+            System.out.println("S. Search Product ID");
+            System.out.println("X. Back to Home Screen");
+
+            String choice = scanner.nextLine();
+
+            switch (choice.toUpperCase()) {
+                case "A" -> System.out.println("ITEM ADDED TO CART"); //addToCart;
+                case "S" -> System.out.println("PRODUCT ID SEARCH"); //add search by id function
+                case "X" -> running = false;
+                default -> System.out.println("Invalid choice!");
+            }
+        }
+
     }
 
     /**
@@ -115,6 +126,22 @@ public class Store {
         //   • compute the total cost
         //   • ask the user whether to check out (C) or return (X)
         //   • if C, call checkOut(cart, totalAmount, scanner)
+        printProducts(cart);
+
+        boolean running = true;
+        while (running){
+            System.out.println("\nShopping Cart");
+            System.out.println("C. CheckOut");
+            System.out.println("X. Back to Home Screen");
+
+            String choice = scanner.nextLine();
+
+            switch (choice.toUpperCase()) {
+                case "C" -> running = true; //addToCart;
+                case "X" -> running = false;
+                default -> System.out.println("Invalid choice!");
+            }
+        }
     }
 
     /**
@@ -138,6 +165,12 @@ public class Store {
     public static Product findProductById(String id, ArrayList<Product> inventory) {
         // TODO: loop over the list and compare ids
         return null;
+    }
+
+    private static void printProducts(ArrayList<Product> products){ //Collection is parent of hashmap and array list so it accepts both
+        for (Product p : products) {
+            System.out.println(p);
+        }
     }
 }
 
