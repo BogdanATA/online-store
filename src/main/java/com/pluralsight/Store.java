@@ -94,8 +94,6 @@ public class Store {
      * Typing X returns to the main menu.
      */
     public static void displayProducts(ArrayList<Product> inventory, Scanner scanner) {
-        // TODO: show each product (id, name, price),
-        //       prompt for an id, find that product, add to cart
         printProducts(inventory);
 
         boolean running = true;
@@ -144,18 +142,36 @@ public class Store {
         }
     }
 
+    public static void removeFromCart(Scanner scanner) {
+        System.out.print("What item would you like to remove: ");
+        String id = scanner.nextLine();
+
+        Product product = findProductById(id, cart);
+
+        if (product != null) {
+            cart.remove(product);
+            System.out.println(product.getName() + " --Was removed from cart.");
+        }else {
+            System.out.println("Product not found.");
+        }
+    }
+
     /**
      * Shows the contents of the cart, calculates the total,
      * and offers the option to check out.
      */
     public static void displayCart(ArrayList<Product> cart, Scanner scanner) {
+
+        System.out.print("\n========== SHOPPING CART ==========");
+        System.out.println("=".repeat(24));
         printProducts(cart); // show all items in cart
-        System.out.println("your cart total is: $" + calculateTotal(cart));
+        System.out.printf("\nyour cart total is: $%.2f%n", calculateTotal(cart)); // call method to calculate total and then displays it
 
         boolean running = true;
         while (running){
             System.out.println("\nShopping Cart");
             System.out.println("C. CheckOut");
+            System.out.println("R. Remove Item");
             System.out.println("X. Back to Home Screen");
 
             String choice = scanner.nextLine();
@@ -163,7 +179,9 @@ public class Store {
             switch (choice.toUpperCase()) {
                 case "C" -> {
                     checkOut(cart, scanner);
+                    running = false;
                 }
+                case "R" -> removeFromCart(scanner);
                 case "X" -> running = false;
                 default -> System.out.println("Invalid choice!");
             }
@@ -181,11 +199,11 @@ public class Store {
     public static double enoughMoney(Scanner scanner, double total) {
         double amountGiven = 0;
         while (amountGiven < total) { // loops until amount given is enough to pay for products
-            System.out.print("Please enter amount of cash you are giving: $");
+            System.out.print("\nPlease enter amount of cash you are giving: $");
             amountGiven = Double.parseDouble(scanner.nextLine());
 
             if (amountGiven < total) {
-                System.out.print("Insufficient funds. You need atleast: $" + total);
+                System.out.printf("\nInsufficient funds. You need atleast: $%.2f%n", total);
             }
         }
         return amountGiven;
@@ -208,6 +226,7 @@ public class Store {
         System.out.printf("Amount Paid:  $%.2f%n", amountGiven);
         System.out.printf("Change:       $%.2f%n", change);
         System.out.println("=============================");
+        System.out.println("Thank you for your purchase!");
     }
 
     /**
@@ -228,7 +247,6 @@ public class Store {
 
         printReceipt(cart, total, amountGiven, change);
         cart.clear();
-        System.out.println("Thank you for your purchase!");
     }
 
     /**
