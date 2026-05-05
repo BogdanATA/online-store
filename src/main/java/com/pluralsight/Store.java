@@ -5,6 +5,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -160,10 +162,7 @@ public class Store {
 
             switch (choice.toUpperCase()) {
                 case "C" -> {
-                    double totalAmount = calculateTotal(cart);
-                    double amountGiven = enoughMoney(scanner, totalAmount);
-                    double totalChange = calculateChange(amountGiven, totalAmount);
-                    checkOut(cart, totalAmount, scanner, totalChange);
+                    checkOut(cart, scanner);
                 }
                 case "X" -> running = false;
                 default -> System.out.println("Invalid choice!");
@@ -172,7 +171,7 @@ public class Store {
     }
 
     public static double calculateTotal(ArrayList<Product> cart) {
-        double total = 0;
+        double total = 0; // set to 0 in case cart is empty
         for (Product product : cart){ // loops through cart
             total += product.getPrice(); // adds total of items inside cart
         }
@@ -181,7 +180,7 @@ public class Store {
 
     public static double enoughMoney(Scanner scanner, double total) {
         double amountGiven = 0;
-        while (amountGiven < total) {
+        while (amountGiven < total) { // loops until amount given is enough to pay for products
             System.out.print("Please enter amount of cash you are giving: $");
             amountGiven = Double.parseDouble(scanner.nextLine());
 
@@ -197,8 +196,18 @@ public class Store {
         return change;
     }
 
-    public static void Receipt() {
+    public static void printReceipt(ArrayList<Product> cart, double total, double amountGiven, double change) {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
+        System.out.println("\n========== RECEIPT ==========");
+        System.out.println("Date: " + timestamp);
+        System.out.println("-----------------------------");
+        printProducts(cart);
+        System.out.println("-----------------------------");
+        System.out.printf("Total:        $%.2f%n", total);
+        System.out.printf("Amount Paid:  $%.2f%n", amountGiven);
+        System.out.printf("Change:       $%.2f%n", change);
+        System.out.println("=============================");
     }
 
     /**
@@ -208,15 +217,18 @@ public class Store {
      * 3. Display a simple receipt.
      * 4. Clear the cart.
      */
-    public static void checkOut(ArrayList<Product> cart, double total, Scanner scanner, double totalChange) {
-        // TODO: implement steps listed above
+    public static void checkOut(ArrayList<Product> cart, Scanner scanner) {
+        if (cart.isEmpty()) {
+            System.out.println("Your cart is empty.");
+            return;
+        }
+        double total = calculateTotal(cart);
+        double amountGiven = enoughMoney(scanner, total);
+        double change = calculateChange(amountGiven, total);
 
-
-
-        System.out.println("Check Out Successful");
-        System.out.println("Your total was: $" + total);
-        System.out.println("Your change was: $" + totalChange);
-        //cart.clear();
+        printReceipt(cart, total, amountGiven, change);
+        cart.clear();
+        System.out.println("Thank you for your purchase!");
     }
 
     /**

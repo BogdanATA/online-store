@@ -25,10 +25,6 @@ public class Product {
 
     @Override
     public String toString() {
-        return "Product{" +
-                "id = " + id +
-                "| name ='" + name + '\'' +
-                "| price = $" + price +
-                '}';
+        return String.format("[%s] %-40s  $%.2f", id, name, price);
     }
 }
