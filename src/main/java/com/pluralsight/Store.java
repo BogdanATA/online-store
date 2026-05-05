@@ -51,10 +51,10 @@ public class Store {
     }
 
     /**
-     * Loads product data from file and puts it into inventory HashMap.
+     * Loads product data from file and puts it into inventory ArrayList.
      *
      * @param fileName file used to read data from
-     * @param inventory HashMap
+     * @param inventory ArrayList
      */
     public static void loadInventory(String fileName, ArrayList<Product> inventory) {
         try {
@@ -91,8 +91,7 @@ public class Store {
      * Displays all products and lets the user add one to the cart.
      * Typing X returns to the main menu.
      */
-    public static void displayProducts(ArrayList<Product> inventory,
-                                       Scanner scanner) {
+    public static void displayProducts(ArrayList<Product> inventory, Scanner scanner) {
         // TODO: show each product (id, name, price),
         //       prompt for an id, find that product, add to cart
         printProducts(inventory);
@@ -100,20 +99,47 @@ public class Store {
         boolean running = true;
         while (running){
             System.out.println("\nWelcome to the Product Page");
-            System.out.println("A. Add Product");
-            System.out.println("S. Search Product ID");
+            System.out.println("A. Add Product to Cart / Search by ID");
             System.out.println("X. Back to Home Screen");
 
             String choice = scanner.nextLine();
 
             switch (choice.toUpperCase()) {
-                case "A" -> System.out.println("ITEM ADDED TO CART"); //addToCart;
-                case "S" -> System.out.println("PRODUCT ID SEARCH"); //add search by id function
+                case "A" -> {
+                    System.out.println("Enter Item ID");
+                    String id = scanner.nextLine().trim();
+                    Product product = findProductById(id, inventory);
+                    if(product == null){
+                        System.out.println("\nProduct not found");
+                    }else{
+                        System.out.println(product);
+                        addToCart(scanner, product);
+                    }
+                }
                 case "X" -> running = false;
                 default -> System.out.println("Invalid choice!");
             }
         }
+    }
 
+    public static void addToCart(Scanner scanner, Product product) {
+        boolean running = true;
+        while(running) {
+        System.out.println("Add Item to Cart? (Y/N)");
+        String command = scanner.nextLine().toUpperCase();
+            switch(command) {
+                case "N" -> {
+                    System.out.println("Item Not Added");
+                    running = false;
+                }
+                case "Y" -> {
+                    cart.add(product);
+                    System.out.println("Item Added to Cart");
+                    running = false;
+                }
+                default -> System.out.println("Invalid Choice");
+            }
+        }
     }
 
     /**
@@ -151,9 +177,7 @@ public class Store {
      * 3. Display a simple receipt.
      * 4. Clear the cart.
      */
-    public static void checkOut(ArrayList<Product> cart,
-                                double totalAmount,
-                                Scanner scanner) {
+    public static void checkOut(ArrayList<Product> cart, double totalAmount, Scanner scanner) {
         // TODO: implement steps listed above
     }
 
@@ -164,10 +188,15 @@ public class Store {
      */
     public static Product findProductById(String id, ArrayList<Product> inventory) {
         // TODO: loop over the list and compare ids
+        for (Product p : inventory) {
+            if (p.getId().equalsIgnoreCase(id)){
+                return p;
+            }
+        }
         return null;
     }
 
-    private static void printProducts(ArrayList<Product> products){ //Collection is parent of hashmap and array list so it accepts both
+    private static void printProducts(ArrayList<Product> products){
         for (Product p : products) {
             System.out.println(p);
         }
