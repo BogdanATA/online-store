@@ -147,12 +147,8 @@ public class Store {
      * and offers the option to check out.
      */
     public static void displayCart(ArrayList<Product> cart, Scanner scanner) {
-        // TODO:
-        //   • list each product in the cart
-        //   • compute the total cost
-        //   • ask the user whether to check out (C) or return (X)
-        //   • if C, call checkOut(cart, totalAmount, scanner)
-        printProducts(cart);
+        printProducts(cart); // show all items in cart
+        System.out.println("your cart total is: $" + calculateTotal(cart));
 
         boolean running = true;
         while (running){
@@ -163,11 +159,46 @@ public class Store {
             String choice = scanner.nextLine();
 
             switch (choice.toUpperCase()) {
-                case "C" -> running = true; //addToCart;
+                case "C" -> {
+                    double totalAmount = calculateTotal(cart);
+                    double amountGiven = enoughMoney(scanner, totalAmount);
+                    double totalChange = calculateChange(amountGiven, totalAmount);
+                    checkOut(cart, totalAmount, scanner, totalChange);
+                }
                 case "X" -> running = false;
                 default -> System.out.println("Invalid choice!");
             }
         }
+    }
+
+    public static double calculateTotal(ArrayList<Product> cart) {
+        double total = 0;
+        for (Product product : cart){ // loops through cart
+            total += product.getPrice(); // adds total of items inside cart
+        }
+        return total; // returns total so it can be used by other methods
+    }
+
+    public static double enoughMoney(Scanner scanner, double total) {
+        double amountGiven = 0;
+        while (amountGiven < total) {
+            System.out.print("Please enter amount of cash you are giving: $");
+            amountGiven = Double.parseDouble(scanner.nextLine());
+
+            if (amountGiven < total) {
+                System.out.print("Insufficient funds. You need atleast: $" + total);
+            }
+        }
+        return amountGiven;
+    }
+
+    public static double calculateChange(double amountGiven, double total) {
+        double change = amountGiven - total;
+        return change;
+    }
+
+    public static void Receipt() {
+
     }
 
     /**
@@ -177,8 +208,15 @@ public class Store {
      * 3. Display a simple receipt.
      * 4. Clear the cart.
      */
-    public static void checkOut(ArrayList<Product> cart, double totalAmount, Scanner scanner) {
+    public static void checkOut(ArrayList<Product> cart, double total, Scanner scanner, double totalChange) {
         // TODO: implement steps listed above
+
+
+
+        System.out.println("Check Out Successful");
+        System.out.println("Your total was: $" + total);
+        System.out.println("Your change was: $" + totalChange);
+        //cart.clear();
     }
 
     /**
