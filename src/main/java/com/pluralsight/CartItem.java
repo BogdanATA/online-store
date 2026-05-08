@@ -35,6 +35,6 @@ public class CartItem {
 
     @Override
     public String toString() {
-        return String.format("[%s] %-30s x%-3d - $%.2f", product.getId(), product.getName(), quantity, getSubtotal());
+        return String.format("[%s] %-40s x%-3d - $%.2f", product.getId(), product.getName(), quantity, getSubtotal());
     }
 }

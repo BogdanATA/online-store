@@ -34,11 +34,11 @@ public class Store {
 
             if (!scanner.hasNextInt()) {
                 System.out.println("Please enter 1, 2, or 3.");
-                scanner.nextLine();                 // discard bad input
+                scanner.nextLine();
                 continue;
             }
             choice = scanner.nextInt();
-            scanner.nextLine();                     // clear newline
+            scanner.nextLine();
 
             switch (choice) {
                 case 1 -> displayProducts(inventory, scanner);
@@ -51,10 +51,10 @@ public class Store {
     }
 
     /**
-     * Loads product data from file and puts it into inventory ArrayList.
+     * Loads product data from file and puts it into inventory ArrayList
      *
      * @param fileName file used to read data from
-     * @param inventory ArrayList
+     * @param inventory ArrayList that store the products from file
      */
     public static void loadInventory(String fileName, ArrayList<Product> inventory) {
         try {
@@ -90,8 +90,10 @@ public class Store {
     }
 
     /**
-     * Displays all products and lets the user add one to the cart.
-     * Typing X returns to the main menu.
+     * Displays all products, lets user search by id and add to cart
+     *
+     * @param inventory list of all available products
+     * @param scanner used to read user input
      */
     public static void displayProducts(ArrayList<Product> inventory, Scanner scanner) {
         boolean running = true;
@@ -108,7 +110,7 @@ public class Store {
                 case "A" -> {
                     System.out.println("Enter Item ID");
                     String id = scanner.nextLine().trim();
-                    Product product = findProductById(id, inventory);
+                    Product product = findProductById(id, inventory); // search inventory for product matching user given id
                     if(product == null){
                         System.out.println("\nProduct not found");
                     }else{
@@ -122,10 +124,16 @@ public class Store {
         }
     }
 
+    /**
+     * Adds items to cart
+     *
+     * @param scanner used to read user input
+     * @param product the product getting added to cart
+     * */
     public static void addToCart(Scanner scanner, Product product) {
         boolean running = true;
         while(running) {
-        System.out.println("Add Item to Cart? (Y/N)");
+        System.out.println("\nAdd Item to Cart? (Y/N)");
         String command = scanner.nextLine().toUpperCase();
             switch(command) {
                 case "N" -> {
@@ -136,7 +144,7 @@ public class Store {
                     // if cart items exists increment its quantity
                     boolean found = false;
                     for (CartItem item : cart) {
-                        if (item.getId().equalsIgnoreCase(product.getId())) {
+                        if (item.getId().equalsIgnoreCase(product.getId())) { // compares id of CartItem to the id of the item the user is adding
                             item.increaseQuantity();  // if item with matching id exists increment the quantity
                             found = true;
                             break;
@@ -153,6 +161,11 @@ public class Store {
         }
     }
 
+    /**
+     * Removes item from cart
+     *
+     * @param scanner used to read user input
+     * */
     public static void removeFromCart(Scanner scanner) {
         System.out.print("What item would you like to remove: ");
         String id = scanner.nextLine().trim();
@@ -164,7 +177,7 @@ public class Store {
                     item.decreaseQuantity();  // if item with matching id exists decrease the quantity
                     System.out.println("Item removed");
                 }else {
-                    cart.remove(item);
+                    cart.remove(item); // if item is found but its quantity is 1 it removes it
                     System.out.println("Item removed");
                 }
             found = true;
@@ -175,14 +188,16 @@ public class Store {
     }
 
     /**
-     * Shows the contents of the cart, calculates the total,
-     * and offers the option to check out.
+     * Displays all items in cart and lets user checkout
+     *
+     * @param cart list of all items in cart that get printed
+     * @param scanner used to read user input
      */
     public static void displayCart(ArrayList<CartItem> cart, Scanner scanner) {
         boolean running = true;
         while (running){
             System.out.print("\n========== SHOPPING CART ==========");
-            System.out.println("=".repeat(24));
+            System.out.println("=".repeat(30));
             printCart(cart); // show all items in cart
             System.out.printf("\nyour cart total is: $%.2f%n", calculateTotal(cart)); // call method to calculate total and then displays it
 
@@ -205,6 +220,12 @@ public class Store {
         }
     }
 
+    /**
+     * Calculates total of items in cart
+     *
+     * @param cart list of items whos price gets calculated
+     * @return total cost of items in cart
+     * */
     public static double calculateTotal(ArrayList<CartItem> cart) {
         double total = 0; // set to 0 in case cart is empty
         for (CartItem item : cart){ // loops through cart
@@ -213,6 +234,13 @@ public class Store {
         return total; // returns total so it can be used by other methods
     }
 
+    /**
+     * Checks to see if user gave enough money for the transaction
+     *
+     * @param scanner used to read user input
+     * @param total amount of money required to pay
+     * @return amount of money the user gave
+     * */
     public static double enoughMoney(Scanner scanner, double total) {
         double amountGiven = 0;
         while (amountGiven < total) { // loops until amount given is enough to pay for products
@@ -230,11 +258,26 @@ public class Store {
         return amountGiven;
     }
 
+    /**
+     * Calculates the change owed to user
+     *
+     * @param amountGiven Amount of money given by user
+     * @param total Total cost of cart
+     * @return Amount of change owed to user
+     * */
     public static double calculateChange(double amountGiven, double total) {
         double change = amountGiven - total;
         return change;
     }
 
+    /**
+     * Prints receipt from transaction
+     *
+     * @param cart List of items purchased
+     * @param total Total cost of items in cart
+     * @param amountGiven Amount of money given by user
+     * @param change Amount of change owed to user
+     * */
     public static void printReceipt(ArrayList<CartItem> cart, double total, double amountGiven, double change) {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
@@ -251,11 +294,10 @@ public class Store {
     }
 
     /**
-     * Handles the checkout process:
-     * 1. Confirm that the user wants to buy.
-     * 2. Accept payment and calculate change.
-     * 3. Display a simple receipt.
-     * 4. Clear the cart.
+     * Handles the checkout flow and clears cart after purchase
+     *
+     * @param cart List of items to purchase
+     * @param scanner Used to read user input
      */
     public static void checkOut(ArrayList<CartItem> cart, Scanner scanner) {
         if (cart.isEmpty()) {
@@ -271,12 +313,13 @@ public class Store {
     }
 
     /**
-     * Searches a list for a product by its id.
+     * Finds products with matching id's
      *
-     * @return the matching Product, or null if not found
+     * @param id The id to search for
+     * @param inventory The list to search through
+     * @return The matching product, or null if not found
      */
     public static Product findProductById(String id, ArrayList<Product> inventory) {
-        // TODO: loop over the list and compare ids
         for (Product p : inventory) {
             if (p.getId().equalsIgnoreCase(id)){
                 return p;
@@ -285,12 +328,22 @@ public class Store {
         return null;
     }
 
+    /**
+     * Prints all products in the list
+     *
+     * @param products List of products to print
+     * */
     private static void printProducts(ArrayList<Product> products){
         for (Product p : products) {
             System.out.println(p);
         }
     }
 
+    /**
+     * Prints all products in the cart list
+     *
+     * @param cart List of cart items to print
+     * */
     private static void printCart(ArrayList<CartItem> cart) {
         for (CartItem item : cart) {
             System.out.println(item);
